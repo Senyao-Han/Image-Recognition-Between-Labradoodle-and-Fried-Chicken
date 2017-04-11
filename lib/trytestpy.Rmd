@@ -1,0 +1,92 @@
+---
+title: "try test.py"
+output: html_notebook
+---
+```{r}
+#packageurl <-"http://cran.r-project.org/bin/windows/Rtools/Rtools34.exe"
+#install.packages(packageurl, contriburl=NULL, type="source")
+```
+
+```{r}
+setwd("~/GitHub/spr2017-proj3-group10/lib")
+library(rPython)
+```
+```{r}
+#Load/run the main Python script
+python.load("test.py")
+# Get the variable from python
+python.load("test.py")
+d <- python.get("d")
+d
+```
+```{r}
+python.load("test_sift.py")
+descs_list <- python.get("descs_list")
+# Convert list to array
+# img_descs <- do.call()
+# length(img_descs)
+length(descs_list)
+#img_sift <- do.call("rbind", img_descs)
+img_sift <- do.call("rbind", descs_list)
+dim(img_sift)
+img_sift[1:5, 1:5]
+```
+```{r}
+img<-readImage("image_0001.jpg")
+display(img)
+```
+```{r}
+img_small <- resize(img, 128, 128)
+display(img_small)
+```
+```{r}
+library("EBImage")
+img_dir<-"C:/Users/sh355/Documents/GitHub/spr2017-proj3-group10/data/rawdata"
+n_files <- length(list.files(img_dir))
+files = list.files(img_dir)
+im<-list()
+for(i in 1:n_files){
+    img <- readImage(paste(img_dir, files[i], sep='/'))
+    im[[i]]<-resize(img, 128, 128)
+}
+```
+```{r}
+setwd("C:/Users/sh355/Documents/GitHub/spr2017-proj3-group10/data/resize")
+for (i in 1:n_files){
+  if (i<10){
+    writeImage(im[[i]], paste("image_000", i,".jpg", sep=""))
+  } else if (i<100){
+    writeImage(im[[i]], paste("image_00", i,".jpg", sep=""))
+  } else if (i<1000){
+    writeImage(im[[i]], paste("image_0", i,".jpg", sep=""))
+  } else{
+    writeImage(im[[i]], paste("image_", i,".jpg", sep=""))
+  }
+}
+```
+```{r}
+x<-feature_up("C:/Users/sh355/Documents/GitHub/spr2017-proj3-group10/data/resizedata", set_name="train")
+```
+```{r}
+setwd("~/GitHub/spr2017-proj3-group10/data")
+write.csv(x, "feature_resize.csv")
+save(x, file="feature_resize.Rdata")
+```
+```{r}
+python.load("sift.py")
+im_features <- python.get("imfeatures")
+```
+```{r}
+# Convert list to array
+# img_descs <- do.call()
+# length(img_descs)
+#length(descs_list)
+#img_sift <- do.call("rbind", img_descs)
+img_sift <- do.call("rbind", im_features)
+dim(img_sift)
+img_sift[1:5, 1:5]
+```
+```{r}
+setwd("~/GitHub/spr2017-proj3-group10/lib")
+python.load("pcasvm.py")
+```
